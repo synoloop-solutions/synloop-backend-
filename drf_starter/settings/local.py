@@ -1,16 +1,6 @@
 from .base import *
+
 environ.Env.read_env(os.path.join(BASE_DIR, 'env/.env.local'))
-
-
-LOCAL_APPS = [
-    "rest_framework",
-
-    "corsheaders",
-    "storages",
-]
-
-# Default django app + your local apps
-INSTALLED_APPS = BASE_APPS + LOCAL_APPS
 
 AWS_ACCESS_KEY_ID = env("S3_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env("S3_SECRET_ACCESS_KEY")
