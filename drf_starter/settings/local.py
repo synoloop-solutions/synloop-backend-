@@ -17,7 +17,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# OPTIONAL: Only use S3 if you want to test it locally (not recommended)
+
 USE_S3 = False
 
 if USE_S3:

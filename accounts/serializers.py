@@ -8,7 +8,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer as SimpleJWTTokenObtainPairSerializer
 
 from django.core.cache import cache
-from .models import CustomUser
+from django.contrib.auth import get_user_model
 
 
 
@@ -59,109 +59,109 @@ class UserSerializer:
             user = User.objects.create_user(**user_data) 
             return user
 
-    # class UserMeSerializer(serializers.ModelSerializer):
+    class UserMeSerializer(serializers.ModelSerializer):
 
-    #     fullName = serializers.CharField(source="fullname")
-    #     class Meta:
-    #         model = User
-    #         fields = (
-    #             "email",
-    #             "username",
-    #             "fullName",
-    #             "id",
-    #         )
+        fullName = serializers.CharField(source="fullname")
+        class Meta:
+            model = User
+            fields = (
+                "email",
+                "username",
+                "fullName",
+                "id",
+            )
 
-    # class UserRetrieveSerializer(serializers.ModelSerializer):
-    #     profileImage = serializers.CharField(source="user.profile.profile_image")
-    #     fullName = serializers.CharField(source="fullname")
+    class UserRetrieveSerializer(serializers.ModelSerializer):
+        profileImage = serializers.CharField(source="user.profile.profile_image")
+        fullName = serializers.CharField(source="fullname")
 
-    #     class Meta:
-    #         model = User
-    #         fields = (
-    #             "email",
-    #             "username",
-    #             "profileImage",
-    #             "fullName",
-    #             # "hasCompletedOnboarding",
-    #             "id",
-    #         )
-    # class ResetPasswordRequestSerializer(serializers.Serializer):
-    #     email = serializers.EmailField(required=True)
+        class Meta:
+            model = User
+            fields = (
+                "email",
+                "username",
+                "profileImage",
+                "fullName",
+                # "hasCompletedOnboarding",
+                "id",
+            )
+    class ResetPasswordRequestSerializer(serializers.Serializer):
+        email = serializers.EmailField(required=True)
 
-    # class ResetPasswordComplete(serializers.Serializer):
-    #     token = serializers.CharField(required=True)
-    #     new_password = serializers.CharField(write_only=True, required=True)
+    class ResetPasswordComplete(serializers.Serializer):
+        token = serializers.CharField(required=True)
+        new_password = serializers.CharField(write_only=True, required=True)
 
-    #     def validate_new_password(self, value):
-    #         from django.contrib.auth.password_validation import validate_password
-    #         validate_password(value)
-    #         return value
+        def validate_new_password(self, value):
+            from django.contrib.auth.password_validation import validate_password
+            validate_password(value)
+            return value
 
-    #     def validate(self, data):
-    #         token = data.get("token")
+        def validate(self, data):
+            token = data.get("token")
 
-    #         try:
-    #             user_id, token = token.split(":", 1)
+            try:
+                user_id, token = token.split(":", 1)
                 
-    #             user = User.objects.get(id=user_id)
-    #         except (ValueError, User.DoesNotExist):
-    #             raise serializers.ValidationError({"token": "Invalid token."})
+                user = User.objects.get(id=user_id)
+            except (ValueError, User.DoesNotExist):
+                raise serializers.ValidationError({"token": "Invalid token."})
 
-    #         token_generator = PasswordResetTokenGenerator()
-    #         if not token_generator.check_token(user, token):
-    #             raise serializers.ValidationError(
-    #                 {"token": "Invalid or expired token."})
+            token_generator = PasswordResetTokenGenerator()
+            if not token_generator.check_token(user, token):
+                raise serializers.ValidationError(
+                    {"token": "Invalid or expired token."})
 
-    #         self.user = user
-    #         return data
+            self.user = user
+            return data
 
-    #     def save(self):
-    #         """
-    #         Updates the user's password.
-    #         """
-    #         self.user.set_password(self.validated_data["new_password"])
-    #         self.user.save()
+        def save(self):
+            """
+            Updates the user's password.
+            """
+            self.user.set_password(self.validated_data["new_password"])
+            self.user.save()
 
-    # class ChangePasswordSerializer(serializers.Serializer):
-    #     old_password = serializers.CharField(required=True, write_only=True)
-    #     new_password = serializers.CharField(required=True, write_only=True)
+    class ChangePasswordSerializer(serializers.Serializer):
+        old_password = serializers.CharField(required=True, write_only=True)
+        new_password = serializers.CharField(required=True, write_only=True)
 
-    #     def validate_new_password(self, value):
-    #         from django.contrib.auth.password_validation import validate_password
-    #         validate_password(value)
-    #         return value
+        def validate_new_password(self, value):
+            from django.contrib.auth.password_validation import validate_password
+            validate_password(value)
+            return value
     
-    #     def validate(self, attrs):
-    #         user = self.context['request'].user
-    #         old_password = attrs.get('old_password')
+        def validate(self, attrs):
+            user = self.context['request'].user
+            old_password = attrs.get('old_password')
 
-    #         is_password_valid = check_password(old_password, user.password)
+            is_password_valid = check_password(old_password, user.password)
             
-    #         if not is_password_valid: 
-    #             raise serializers.ValidationError({"old_password": "Invalid password."})
+            if not is_password_valid: 
+                raise serializers.ValidationError({"old_password": "Invalid password."})
         
-    #         return super().validate(attrs)
+            return super().validate(attrs)
     
-    #     def create(self, validated_data):
-    #         """
-    #         Updates the user's password.
-    #         """
-    #         user = self.context['request'].user
-    #         user.set_password(self.validated_data["new_password"])
-    #         user.save()
-    #         return user
+        def create(self, validated_data):
+            """
+            Updates the user's password.
+            """
+            user = self.context['request'].user
+            user.set_password(self.validated_data["new_password"])
+            user.save()
+            return user
 
-    # class UserUpdateSerializer(serializers.ModelSerializer):
-    #     class Meta:
-    #         model = User
-    #         fields = ("first_name", "last_name") 
+    class UserUpdateSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = User
+            fields = ("first_name", "last_name") 
 
-    #     def update(self, instance, validated_data):
-    #         instance.first_name = validated_data.get("first_name", instance.first_name)
-    #         instance.last_name = validated_data.get("last_name", instance.last_name)
-    #         instance.save()
+        def update(self, instance, validated_data):
+            instance.first_name = validated_data.get("first_name", instance.first_name)
+            instance.last_name = validated_data.get("last_name", instance.last_name)
+            instance.save()
 
-    #         return instance
+            return instance
 
 
 class TokenObtainSerializer(SimpleJWTTokenObtainPairSerializer):
