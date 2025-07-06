@@ -7,6 +7,9 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer as SimpleJWTTokenObtainPairSerializer
 
+from django.core.cache import cache
+from django.contrib.auth import get_user_model
+
 
 
 User = get_user_model()
@@ -14,6 +17,8 @@ logger = logging.getLogger(__file__)
 
 class UserSerializer:
     class UserCreateSerializer(serializers.ModelSerializer):
+        password = serializers.CharField(write_only=True)
+        token = serializers.CharField(write_only=True)
 
         class Meta:
             model = User
@@ -23,9 +28,25 @@ class UserSerializer:
                 "username",
                 "first_name",
                 "last_name",
+                "token"     # cache token
             )
         
+        '''Validate email and token'''    
+        def validate(self, data):
+            email = data.get('email')
+            token = data.get('token')
+            cache_token = cache.get(email)
+            
+            if not email or not token:
+                raise serializers.ValidationError("Email and token are required.")
+            cache_token = cache.get(email)
+            if cache_token != token:
+                raise serializers.ValidationError("Invalid or expired invite token.")
+            cache.delete(email)
+            return data
+        
         def create(self, validated_data):
+            validated_data.pop('token')
 
             user_data = dict(
                 email=validated_data['email'],
@@ -61,7 +82,7 @@ class UserSerializer:
                 "username",
                 "profileImage",
                 "fullName",
-                "hasCompletedOnboarding",
+                # "hasCompletedOnboarding",
                 "id",
             )
     class ResetPasswordRequestSerializer(serializers.Serializer):

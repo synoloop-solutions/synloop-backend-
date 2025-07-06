@@ -68,16 +68,16 @@ AUTHENTICATION_BACKENDS = [
 
 WSGI_APPLICATION = 'drf_starter.wsgi.application'
 
-DATABASES = {           
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("DATABASE_NAME"),
-        'USER': env("DATABASE_USER"),
-        'PASSWORD': env("DATABASE_PASSWORD"),
-        'HOST': env("DATABASE_HOST"),
-        'PORT': env("DATABASE_PORT")
-    } 
-}
+# DATABASES = {           
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': env("DATABASE_NAME"),
+#         'USER': env("DATABASE_USER"),
+#         'PASSWORD': env("DATABASE_PASSWORD"),
+#         'HOST': env("DATABASE_HOST"),
+#         'PORT': env("DATABASE_PORT")
+#     } 
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {

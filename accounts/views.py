@@ -7,16 +7,18 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView as SimpleJWTTokenObtainPairView
 
 from .serializers import UserSerializer, TokenObtainSerializer
+from django.core.cache import cache
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
 class UserViewset(viewsets.ModelViewSet):
-    serializer_class = UserSerializer.UserRetrieveSerializer
+    serializer_class = UserSerializer.UserCreateSerializer
     queryset = User.objects.all()
 
     @transaction.atomic()
@@ -25,19 +27,14 @@ class UserViewset(viewsets.ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
 
-            response_serializer = self.get_serializer(user)
-
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token
-
-            data = {
+            response_serializer = self.get_serializer(user)
+            return Response({
                 "refresh": str(refresh),
                 "access": str(access),
                 "user": response_serializer.data
-            }
-
-            response = Response(data=data, status=status.HTTP_201_CREATED)
-            return response
+            }, status=status.HTTP_201_CREATED)
         else:
             logger.error(f"User registration failed due to invalid data: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
