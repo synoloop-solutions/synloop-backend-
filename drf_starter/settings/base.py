@@ -30,7 +30,8 @@ INSTALLED_APPS = [
     "storages",
 
     "apps.accounts",
-    "apps.user"
+    "apps.user",
+    "apps.core"
 ]
 
 MIDDLEWARE = [
