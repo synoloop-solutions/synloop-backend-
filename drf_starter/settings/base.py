@@ -6,13 +6,6 @@ from pathlib import Path
 env = environ.Env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-environ.Env.read_env(os.path.join(BASE_DIR, '.env.local'))
-
-SECRET_KEY = env("SECRET_KEY", default="test_key")
-
-DEBUG = env("DEBUG", default="True")
-
-ALLOWED_HOSTS = env("ALLOWED_HOSTS", default="localhost,").split(",")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -118,7 +111,6 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",")
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 SPECTACULAR_SETTINGS = {

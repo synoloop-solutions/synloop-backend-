@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Project, ProjectMember, ProjectMemberInvite
+from .models import Project, ProjectMember, ProjectMemberInvite, Task
 
 
 class ProjectMemberInviteSerializers:
@@ -68,4 +68,44 @@ class ProjectSerializers:
             model = ProjectMemberInvite
             fields = [
                 'email',
+            ]
+
+
+class TaskSerializers:
+    class TaskCreateSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Task
+            fields = [
+                'title',
+                'description',
+                'assigned_to',
+                'due_date',
+                'status',
+                'project',
+            ]
+
+    class TaskRetrieveSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Task
+            fields = [
+                'id',
+                'title',
+                'description',
+                'assigned_to',
+                'due_date',
+                'status',
+                'project',
+                'created_at',
+                'updated_at',
+            ]
+
+    class TaskUpdateSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Task
+            fields = [
+                'title',
+                'description',
+                'assigned_to',
+                'due_date',
+                'status',
             ]

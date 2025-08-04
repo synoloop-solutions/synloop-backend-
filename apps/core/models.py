@@ -62,3 +62,32 @@ class ProjectMember(models.Model):
         verbose_name_plural = "Project Members"
         unique_together = ('project', 'member')
         ordering = ['-joined_at']
+
+
+class Task(models.Model):
+    project = models.ForeignKey(Project, related_name='tasks', on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    assigned_to = models.ForeignKey(
+        User,
+        related_name='tasks',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[('todo', 'To Do'), ('in_progress', 'In Progress'), ('done', 'Done')],
+        default='todo'
+    )
+    due_date = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Task"
+        verbose_name_plural = "Tasks"
+        ordering = ['-created_at']

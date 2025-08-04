@@ -1,12 +1,20 @@
 from .base import *
 import os
 import dj_database_url
-environ.Env.read_env(os.path.join(BASE_DIR, '.env.local'))
+print("production")
+environ.Env.read_env(os.path.join(BASE_DIR, '.env.prod'))
 
 DEBUG = False
 
+SECRET_KEY = env("SECRET_KEY", default="test_key")
+
 DATABASES = {
-    "default":dj_database_url.config(default=os.environ.get("DATABASE_URL"))
+    'default': dj_database_url.config(
+        engine='django.db.backends.postgresql',
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 
@@ -24,9 +32,11 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
-ALLOWED_HOSTS = env(ALLOWED_HOSTS)
+ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(",")
+
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",")
 
 CACHES = {
     'default': {
